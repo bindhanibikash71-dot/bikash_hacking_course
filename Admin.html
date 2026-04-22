@@ -3,127 +3,264 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <title>NeonLearn | Admin Dashboard</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
-        body { font-family: sans-serif; margin: 0; background: #eef; }
-        header { background: #dc3545; color: white; padding: 15px; display: flex; justify-content: space-between; }
-        header a { color: white; text-decoration: none; }
-        .container { padding: 20px; max-width: 500px; margin: auto; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; box-sizing: border-box; border-radius: 5px; border: 1px solid #ddd; }
-        button { background: #28a745; color: white; border: none; font-weight: bold; cursor: pointer; }
-        button.logout { background: #333; margin-top: 20px; }
-        .hidden { display: none; }
+        :root {
+            --bg-dark: #0B0C10;
+            --primary-neon: #a855f7;
+            --secondary-neon: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: -1;
+            opacity: 0.3;
+        }
+        .blob-1 { top: 0; left: 0; width: 500px; height: 500px; background: var(--secondary-neon); }
+        .blob-2 { bottom: 0; right: 0; width: 400px; height: 400px; background: var(--primary-neon); }
+
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        h2 { text-align: center; margin-bottom: 25px; font-size: 2rem; background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
+
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1; }
+        
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.2);
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus, textarea:focus { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        
+        input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+            border: 1px dashed var(--secondary-neon);
+            color: #cbd5e1;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        button:hover { box-shadow: 0 0 20px var(--primary-neon); transform: translateY(-2px); }
+
+        #dashboard { display: none; max-width: 600px; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <span>🔒 Admin Panel</span>
-    <a href="index.html">Go to User Site</a>
-</header>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
 
-<div class="container">
-    <div id="adminLoginBox" class="box">
-        <h2>Admin Access Only</h2>
-        <input type="email" id="adminEmail" placeholder="Admin Email">
-        <input type="password" id="adminPass" placeholder="Admin Password">
-        <button onclick="adminLogin()">Login as Admin</button>
+    <!-- Admin Login Screen -->
+    <div class="glass" id="loginScreen">
+        <h2>Admin Portal</h2>
+        <div class="input-group">
+            <label>Admin Email</label>
+            <input type="email" id="adminEmail" placeholder="admin@gmail.com">
+        </div>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="adminPass" placeholder="••••••••">
+        </div>
+        <button onclick="adminLogin()">Access Dashboard</button>
     </div>
 
-    <div id="uploadBox" class="box hidden">
-        <h2>Upload New Course</h2>
-        <input type="text" id="cTitle" placeholder="Course Title">
-        <input type="number" id="cPrice" placeholder="Price">
-        <input type="text" id="cDesc" placeholder="Description">
-        <label>Cover Image:</label>
-        <input type="file" id="cImg" accept="image/*">
-        <label>Course Video:</label>
-        <input type="file" id="cVid" accept="video/*">
-        <button onclick="uploadCourse()">🚀 Upload Course</button>
-        <button class="logout" onclick="logout()">Logout</button>
+    <!-- Admin Upload Dashboard -->
+    <div class="glass" id="dashboard">
+        <h2>Upload Course</h2>
+        <div class="input-group">
+            <label>Course Title</label>
+            <input type="text" id="cTitle" placeholder="e.g. Advanced React Masterclass">
+        </div>
+        <div class="input-group">
+            <label>Price (INR)</label>
+            <input type="number" id="cPrice" placeholder="e.g. 2999">
+        </div>
+        <div class="input-group">
+            <label>Description</label>
+            <textarea id="cDesc" rows="3" placeholder="What will they learn?"></textarea>
+        </div>
+        <div class="input-group">
+            <label>Course Thumbnail (Image)</label>
+            <input type="file" id="cImage" accept="image/*">
+        </div>
+        <div class="input-group">
+            <label>Course Video (MP4)</label>
+            <input type="file" id="cVideo" accept="video/*">
+        </div>
+        <button onclick="uploadCourse()">Publish Course</button>
+        <button onclick="logoutAdmin()" style="background: transparent; border: 1px solid red; margin-top:15px; box-shadow:none;">Logout</button>
     </div>
-</div>
 
-<script>
-    // --- 1. YOUR FIREBASE CONFIG ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyA-s334SmkKcFa9Y2exA8rFvYyHfwpk_kk",
-        authDomain: "mycourse-5e043.firebaseapp.com",
-        databaseURL: "https://mycourse-5e043-default-rtdb.firebaseio.com",
-        projectId: "mycourse-5e043",
-        storageBucket: "mycourse-5e043.firebasestorage.app",
-        messagingSenderId: "443359135204",
-        appId: "1:443359135204:web:b4758a8da8d6efe60a33f1"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    const storage = firebase.storage();
+    <!-- Firebase v8 Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-    // --- 2. ADMIN LOGIN ---
-    function adminLogin() {
-        const e = document.getElementById('adminEmail').value;
-        const p = document.getElementById('adminPass').value;
-        
-        auth.signInWithEmailAndPassword(e, p)
-            .then((userCredential) => {
-                // YAHAN APNI EMAIL ID DALO
-                if(userCredential.user.email === "bindhanibikash71@gmail.com") { 
-                    document.getElementById('adminLoginBox').classList.add('hidden');
-                    document.getElementById('uploadBox').classList.remove('hidden');
-                } else {
-                    alert("Access Denied!");
-                    auth.signOut();
-                }
-            })
-            .catch(err => alert("Login Failed: " + err.message));
-    }
+    <script>
+        // ==========================================
+        // ⚠️ PASTE YOUR FIREBASE CONFIG HERE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
 
-    function logout() { auth.signOut(); location.reload(); }
+        // Check Auth State
+        auth.onAuthStateChanged(user => {
+            if(user && user.email === "admin@gmail.com") {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+            } else {
+                document.getElementById('loginScreen').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'none';
+            }
+        });
 
-    // --- 3. UPLOAD LOGIC ---
-    async function uploadCourse() {
-        const title = document.getElementById('cTitle').value;
-        const price = document.getElementById('cPrice').value;
-        const desc = document.getElementById('cDesc').value;
-        const imgFile = document.getElementById('cImg').files[0];
-        const vidFile = document.getElementById('cVid').files[0];
+        async function adminLogin() {
+            const email = document.getElementById('adminEmail').value;
+            const pass = document.getElementById('adminPass').value;
 
-        if(!title || !price || !imgFile || !vidFile) {
-            alert("Please fill all fields!");
-            return;
+            if(email !== "admin@gmail.com") {
+                Swal.fire({ icon: 'error', title: 'Access Denied', text: 'You are not an admin.', background: '#0B0C10', color: '#fff' });
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                Swal.fire({ icon: 'success', title: 'Welcome Admin', background: '#0B0C10', color: '#fff' });
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Login Failed', text: error.message, background: '#0B0C10', color: '#fff' });
+            }
         }
 
-        try {
-            const imgRef = storage.ref(`images/${Date.now()}_${imgFile.name}`);
-            await imgRef.put(imgFile);
-            const imgUrl = await imgRef.getDownloadURL();
-            
-            const vidRef = storage.ref(`videos/${Date.now()}_${vidFile.name}`);
-            await vidRef.put(vidFile);
-            const vidUrl = await vidRef.getDownloadURL();
-            
-            await db.collection('courses').add({
-                title: title,
-                price: Number(price),
-                description: desc,
-                imageUrl: imgUrl,
-                videoUrl: vidUrl
+        function logoutAdmin() {
+            auth.signOut();
+        }
+
+        async function uploadCourse() {
+            const title = document.getElementById('cTitle').value;
+            const price = document.getElementById('cPrice').value;
+            const desc = document.getElementById('cDesc').value;
+            const imageFile = document.getElementById('cImage').files[0];
+            const videoFile = document.getElementById('cVideo').files[0];
+
+            if(!title || !price || !desc || !imageFile || !videoFile) {
+                Swal.fire({ icon: 'warning', title: 'Missing Info', text: 'Please fill all fields and select files.', background: '#0B0C10', color: '#fff' });
+                return;
+            }
+
+            // Show Loading State
+            Swal.fire({
+                title: 'Uploading Course...',
+                text: 'Please wait while files are uploaded to servers.',
+                background: '#0B0C10',
+                color: '#fff',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
             });
 
-            alert("✅ Course Uploaded!");
-            location.reload();
-            
-        } catch (error) {
-            alert("❌ Error: " + error.message);
+            try {
+                // 1. Upload Image to Storage
+                const imageRef = storage.ref(`courses/images/${Date.now()}_${imageFile.name}`);
+                await imageRef.put(imageFile);
+                const imageUrl = await imageRef.getDownloadURL();
+
+                // 2. Upload Video to Storage
+                const videoRef = storage.ref(`courses/videos/${Date.now()}_${videoFile.name}`);
+                await videoRef.put(videoFile);
+                const videoUrl = await videoRef.getDownloadURL();
+
+                // 3. Save to Firestore
+                await db.collection('courses').add({
+                    title: title,
+                    price: Number(price),
+                    description: desc,
+                    imageUrl: imageUrl,
+                    videoUrl: videoUrl,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Success
+                Swal.fire({ icon: 'success', title: 'Published!', text: 'Course is now live.', background: '#0B0C10', color: '#fff' });
+                
+                // Clear Form
+                document.getElementById('cTitle').value = '';
+                document.getElementById('cPrice').value = '';
+                document.getElementById('cDesc').value = '';
+                document.getElementById('cImage').value = '';
+                document.getElementById('cVideo').value = '';
+
+            } catch (error) {
+                console.error(error);
+                Swal.fire({ icon: 'error', title: 'Upload Failed', text: error.message, background: '#0B0C10', color: '#fff' });
+            }
         }
-    }
-</script>
+    </script>
 </body>
 </html>
