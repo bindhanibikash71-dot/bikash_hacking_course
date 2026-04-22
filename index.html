@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Course Store</title>
-    <!-- Firebase & Razorpay -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -41,7 +40,7 @@
         <button style="background:#007bff" onclick="register()">Register New Account</button>
     </div>
 
-    <!-- Course List (Hidden until login) -->
+    <!-- Course List -->
     <div id="courseSection" class="hidden">
         <h2>Welcome, <span id="userName"></span></h2>
         <button style="background:#dc3545; width:auto;" onclick="logout()">Logout</button>
@@ -52,21 +51,24 @@
 </div>
 
 <script>
-    // --- 1. CONFIGURATION ---
+    // --- 1. YOUR FIREBASE CONFIG ---
     const firebaseConfig = {
-        apiKey: "YAHAN_API_KEY_DALO",
-        authDomain: "PROJECT_ID.firebaseapp.com",
-        projectId: "PROJECT_ID",
-        storageBucket: "PROJECT_ID.appspot.com",
-        messagingSenderId: "SENDER_ID",
-        appId: "APP_ID"
+        apiKey: "AIzaSyA-s334SmkKcFa9Y2exA8rFvYyHfwpk_kk",
+        authDomain: "mycourse-5e043.firebaseapp.com",
+        databaseURL: "https://mycourse-5e043-default-rtdb.firebaseio.com",
+        projectId: "mycourse-5e043",
+        storageBucket: "mycourse-5e043.firebasestorage.app",
+        messagingSenderId: "443359135204",
+        appId: "1:443359135204:web:b4758a8da8d6efe60a33f1"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
-    const RAZORPAY_KEY = "rzp_test_YOUR_KEY"; 
+    
+    // --- 2. RAZORPAY KEY (Yahan apni Key ID dalna) ---
+    const RAZORPAY_KEY = "rzp_test_YOUR_KEY_ID"; 
 
-    // --- 2. AUTH LOGIC ---
+    // --- AUTH LOGIC ---
     auth.onAuthStateChanged((user) => {
         if (user) {
             document.getElementById('loginSection').classList.add('hidden');
@@ -96,7 +98,7 @@
 
     function logout() { auth.signOut(); }
 
-    // --- 3. LOAD COURSES ---
+    // --- LOAD COURSES ---
     async function loadCourses() {
         const list = document.getElementById('courseList');
         list.innerHTML = "";
@@ -118,7 +120,7 @@
         });
     }
 
-    // --- 4. PAYMENT ---
+    // --- PAYMENT ---
     function buyCourse(id, price) {
         var options = {
             "key": RAZORPAY_KEY,
@@ -127,12 +129,10 @@
             "name": "Course Store",
             "handler": function (response){
                 alert("Payment Successful! ID: " + response.razorpay_payment_id);
-                // Yahan baad mein hum video access denge
             }
         };
         new Razorpay(options).open();
     }
 </script>
-
 </body>
 </html>
