@@ -3,136 +3,429 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Course Store</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <title>NeonLearn | Premium Courses</title>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- SweetAlert2 for beautiful popups -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Razorpay SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
     <style>
-        body { font-family: sans-serif; margin: 0; background: #f4f4f4; }
-        header { background: #333; color: white; padding: 15px; display: flex; justify-content: space-between; align-items: center; }
-        header a { color: white; text-decoration: none; font-weight: bold; }
-        .container { padding: 20px; max-width: 600px; margin: auto; }
-        .course-card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .course-card img { width: 100%; height: 180px; object-fit: cover; border-radius: 5px; }
-        button { background: #28a745; color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; }
-        input { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; }
-        .hidden { display: none; }
+        :root {
+            --bg-dark: #0f1016;
+            --primary-neon: #a855f7;
+            --secondary-neon: #3b82f6;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Abstract Neon Background Blobs */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 400px; height: 400px; background: var(--primary-neon); }
+        .blob-2 { bottom: -10%; right: -10%; width: 500px; height: 500px; background: var(--secondary-neon); }
+
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 5%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .nav-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: white;
+            border: 1px solid var(--primary-neon);
+            cursor: pointer;
+            transition: 0.3s;
+            font-weight: 600;
+        }
+        .nav-btn:hover {
+            background: var(--primary-neon);
+            box-shadow: 0 0 15px var(--primary-neon);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 1s ease-in;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+        .hero p {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+        
+        /* Courses Grid */
+        .courses-container {
+            padding: 50px 5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1400px;
+            margin: auto;
+        }
+        .course-card {
+            padding: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .course-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(168, 85, 247, 0.2);
+        }
+        .course-img {
+            width: 100%;
+            height: 200px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+        .course-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        .course-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+        .course-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--secondary-neon);
+        }
+        .btn-buy {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-buy:hover {
+            box-shadow: 0 0 15px var(--secondary-neon);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .modal-content {
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            text-align: center;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.05);
+            color: white;
+            outline: none;
+        }
+        .modal-content input:focus {
+            border-color: var(--primary-neon);
+        }
+        .modal-btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary-neon);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .toggle-auth {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        .toggle-auth span { color: var(--secondary-neon); }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2rem; }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <span>🎓 Course Store</span>
-    <div id="navLinks">
-        <a href="admin.html">Admin Login</a>
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass">
+        <div class="logo">NeonLearn</div>
+        <button class="nav-btn" id="authBtn" onclick="openModal()">Login</button>
+    </nav>
+
+    <header class="hero">
+        <h1>Master the Future of Tech</h1>
+        <p>Premium courses curated for elite developers and designers.</p>
+        <button class="btn-buy" style="padding: 15px 30px; font-size: 1.1rem;" onclick="scrollToCourses()">Explore Courses</button>
+    </header>
+
+    <div class="courses-container" id="coursesGrid">
+        <!-- Courses will be injected here via JS -->
     </div>
-</header>
 
-<div class="container">
-    <!-- Login Form -->
-    <div id="loginSection">
-        <h2>Login to Buy Courses</h2>
-        <input type="email" id="email" placeholder="Enter Email">
-        <input type="password" id="password" placeholder="Enter Password">
-        <button onclick="login()">Login</button>
-        <button style="background:#007bff" onclick="register()">Register New Account</button>
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-content glass">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">Login</h2>
+            <input type="email" id="email" placeholder="Email Address">
+            <input type="password" id="password" placeholder="Password">
+            <button class="modal-btn" onclick="handleAuth()" id="submitAuthBtn">Sign In</button>
+            <p class="toggle-auth" onclick="toggleAuthMode()">Don't have an account? <span id="toggleText">Register</span></p>
+        </div>
     </div>
 
-    <!-- Course List -->
-    <div id="courseSection" class="hidden">
-        <h2>Welcome, <span id="userName"></span></h2>
-        <button style="background:#dc3545; width:auto;" onclick="logout()">Logout</button>
-        <hr>
-        <h3>Available Courses:</h3>
-        <div id="courseList">Loading...</div>
-    </div>
-</div>
+    <!-- Firebase v8 Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
-<script>
-    // --- 1. YOUR FIREBASE CONFIG ---
-    const firebaseConfig = {
-        apiKey: "AIzaSyA-s334SmkKcFa9Y2exA8rFvYyHfwpk_kk",
-        authDomain: "mycourse-5e043.firebaseapp.com",
-        databaseURL: "https://mycourse-5e043-default-rtdb.firebaseio.com",
-        projectId: "mycourse-5e043",
-        storageBucket: "mycourse-5e043.firebasestorage.app",
-        messagingSenderId: "443359135204",
-        appId: "1:443359135204:web:b4758a8da8d6efe60a33f1"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-    
-    // --- 2. RAZORPAY KEY (Yahan apni Key ID dalna) ---
-    const RAZORPAY_KEY = "rzp_test_YOUR_KEY_ID"; 
-
-    // --- AUTH LOGIC ---
-    auth.onAuthStateChanged((user) => {
-        if (user) {
-            document.getElementById('loginSection').classList.add('hidden');
-            document.getElementById('courseSection').classList.remove('hidden');
-            document.getElementById('userName').innerText = user.email;
-            loadCourses();
-        } else {
-            document.getElementById('loginSection').classList.remove('hidden');
-            document.getElementById('courseSection').classList.add('hidden');
-        }
-    });
-
-    function register() {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        auth.createUserWithEmailAndPassword(e, p)
-            .then(() => alert("Account Created! Please Login."))
-            .catch(err => alert(err.message));
-    }
-
-    function login() {
-        const e = document.getElementById('email').value;
-        const p = document.getElementById('password').value;
-        auth.signInWithEmailAndPassword(e, p)
-            .catch(err => alert(err.message));
-    }
-
-    function logout() { auth.signOut(); }
-
-    // --- LOAD COURSES ---
-    async function loadCourses() {
-        const list = document.getElementById('courseList');
-        list.innerHTML = "";
-        const snap = await db.collection('courses').get();
-        
-        if(snap.empty) { list.innerHTML = "<p>No courses available yet.</p>"; return; }
-
-        snap.forEach(doc => {
-            const d = doc.data();
-            list.innerHTML += `
-                <div class="course-card">
-                    <img src="${d.imageUrl}">
-                    <h3>${d.title}</h3>
-                    <p>${d.description}</p>
-                    <p><strong>Price: ₹${d.price}</strong></p>
-                    <button onclick="buyCourse('${doc.id}', ${d.price})">Buy Now</button>
-                </div>
-            `;
-        });
-    }
-
-    // --- PAYMENT ---
-    function buyCourse(id, price) {
-        var options = {
-            "key": RAZORPAY_KEY,
-            "amount": price * 100,
-            "currency": "INR",
-            "name": "Course Store",
-            "handler": function (response){
-                alert("Payment Successful! ID: " + response.razorpay_payment_id);
-            }
+    <script>
+        // ==========================================
+        // ⚠️ PASTE YOUR FIREBASE CONFIG HERE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_MESSAGING_ID",
+            appId: "YOUR_APP_ID"
         };
-        new Razorpay(options).open();
-    }
-</script>
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // ==========================================
+        // ⚠️ PASTE YOUR RAZORPAY KEY ID HERE
+        // ==========================================
+        const RAZORPAY_KEY_ID = "YOUR_RAZORPAY_KEY_ID";
+
+        // Global State
+        let isLoginMode = true;
+        let currentUser = null;
+
+        // Listen for Auth State
+        auth.onAuthStateChanged(user => {
+            currentUser = user;
+            const authBtn = document.getElementById('authBtn');
+            if(user) {
+                authBtn.innerText = "Logout";
+                authBtn.onclick = () => auth.signOut();
+                closeModal();
+            } else {
+                authBtn.innerText = "Login";
+                authBtn.onclick = openModal;
+            }
+        });
+
+        // UI Logic
+        function scrollToCourses() {
+            document.getElementById('coursesGrid').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function openModal() { document.getElementById('authModal').classList.add('active'); }
+        function closeModal() { document.getElementById('authModal').classList.remove('active'); }
+
+        function toggleAuthMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('modalTitle').innerText = isLoginMode ? "Login" : "Register";
+            document.getElementById('submitAuthBtn').innerText = isLoginMode ? "Sign In" : "Sign Up";
+            document.getElementById('toggleText').innerText = isLoginMode ? "Register" : "Login";
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const pass = document.getElementById('password').value;
+            try {
+                if(isLoginMode) {
+                    await auth.signInWithEmailAndPassword(email, pass);
+                    Swal.fire({ icon: 'success', title: 'Welcome Back!', background: '#0f1016', color: '#fff' });
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, pass);
+                    Swal.fire({ icon: 'success', title: 'Account Created!', background: '#0f1016', color: '#fff' });
+                }
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Oops...', text: error.message, background: '#0f1016', color: '#fff' });
+            }
+        }
+
+        // Fetch Courses from Firestore
+        async function loadCourses() {
+            const grid = document.getElementById('coursesGrid');
+            grid.innerHTML = `<h3 style="text-align:center; width:100%; color:#9ca3af;">Loading courses...</h3>`;
+            
+            try {
+                const snapshot = await db.collection('courses').get();
+                grid.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    grid.innerHTML = `<h3 style="text-align:center; width:100%; color:#9ca3af;">No courses available yet.</h3>`;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    grid.innerHTML += `
+                        <div class="course-card glass">
+                            <img src="${data.imageUrl}" alt="Course Image" class="course-img">
+                            <h3 class="course-title">${data.title}</h3>
+                            <p class="course-desc">${data.description}</p>
+                            <div class="course-footer">
+                                <span class="price">₹${data.price}</span>
+                                <button class="btn-buy" onclick="initiatePayment('${doc.id}', '${data.title}', ${data.price})">Buy Now</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                grid.innerHTML = `<h3 style="text-align:center; width:100%; color:red;">Error loading courses. Check Firebase Rules/Config.</h3>`;
+                console.error(error);
+            }
+        }
+
+        // Razorpay Payment Logic (Frontend Only Demonstration)
+        function initiatePayment(courseId, title, price) {
+            if(!currentUser) {
+                Swal.fire({ icon: 'warning', title: 'Login Required', text: 'Please login to purchase.', background: '#0f1016', color: '#fff' });
+                openModal();
+                return;
+            }
+
+            const options = {
+                "key": RAZORPAY_KEY_ID, 
+                "amount": price * 100, // Amount is in currency subunits (paise)
+                "currency": "INR",
+                "name": "NeonLearn",
+                "description": "Purchase: " + title,
+                "image": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+                "handler": function (response) {
+                    // Payment Success Callback
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Payment Successful!',
+                        text: `You now have access to ${title}. Payment ID: ${response.razorpay_payment_id}`,
+                        background: '#0f1016',
+                        color: '#fff',
+                        confirmButtonColor: '#a855f7'
+                    });
+                    // Note: In a real app, you would save this purchase in Firestore here.
+                },
+                "prefill": {
+                    "email": currentUser.email
+                },
+                "theme": {
+                    "color": "#a855f7"
+                }
+            };
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (response){
+                Swal.fire({ icon: 'error', title: 'Payment Failed', text: response.error.description, background: '#0f1016', color: '#fff' });
+            });
+            rzp.open();
+        }
+
+        // Init
+        loadCourses();
+    </script>
 </body>
 </html>
