@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel</title>
-    <!-- Firebase SDKs (Storage ke liye extra script) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
@@ -30,7 +29,6 @@
 </header>
 
 <div class="container">
-    <!-- Admin Login -->
     <div id="adminLoginBox" class="box">
         <h2>Admin Access Only</h2>
         <input type="email" id="adminEmail" placeholder="Admin Email">
@@ -38,52 +36,49 @@
         <button onclick="adminLogin()">Login as Admin</button>
     </div>
 
-    <!-- Upload Form (Hidden until admin logs in) -->
     <div id="uploadBox" class="box hidden">
         <h2>Upload New Course</h2>
-        <input type="text" id="cTitle" placeholder="Course Title (e.g. Python Course)">
-        <input type="number" id="cPrice" placeholder="Price (e.g. 500)">
-        <input type="text" id="cDesc" placeholder="Short Description">
-        
-        <label>Select Cover Image:</label>
+        <input type="text" id="cTitle" placeholder="Course Title">
+        <input type="number" id="cPrice" placeholder="Price">
+        <input type="text" id="cDesc" placeholder="Description">
+        <label>Cover Image:</label>
         <input type="file" id="cImg" accept="image/*">
-        
-        <label>Select Course Video:</label>
+        <label>Course Video:</label>
         <input type="file" id="cVid" accept="video/*">
-        
         <button onclick="uploadCourse()">🚀 Upload Course</button>
         <button class="logout" onclick="logout()">Logout</button>
     </div>
 </div>
 
 <script>
-    // --- 1. CONFIGURATION (Same as index.html) ---
+    // --- 1. YOUR FIREBASE CONFIG ---
     const firebaseConfig = {
-        apiKey: "YAHAN_API_KEY_DALO",
-        authDomain: "PROJECT_ID.firebaseapp.com",
-        projectId: "PROJECT_ID",
-        storageBucket: "PROJECT_ID.appspot.com",
-        messagingSenderId: "SENDER_ID",
-        appId: "APP_ID"
+        apiKey: "AIzaSyA-s334SmkKcFa9Y2exA8rFvYyHfwpk_kk",
+        authDomain: "mycourse-5e043.firebaseapp.com",
+        databaseURL: "https://mycourse-5e043-default-rtdb.firebaseio.com",
+        projectId: "mycourse-5e043",
+        storageBucket: "mycourse-5e043.firebasestorage.app",
+        messagingSenderId: "443359135204",
+        appId: "1:443359135204:web:b4758a8da8d6efe60a33f1"
     };
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
     const storage = firebase.storage();
 
-    // --- 2. ADMIN LOGIN CHECK ---
+    // --- 2. ADMIN LOGIN ---
     function adminLogin() {
         const e = document.getElementById('adminEmail').value;
         const p = document.getElementById('adminPass').value;
         
         auth.signInWithEmailAndPassword(e, p)
             .then((userCredential) => {
-                // Security Check: Sirf specific email ko allow karein
-                if(userCredential.user.email === "admin@gmail.com") { // Yahan apni email dalna
+                // YAHAN APNI EMAIL ID DALO
+                if(userCredential.user.email === "admin@gmail.com") { 
                     document.getElementById('adminLoginBox').classList.add('hidden');
                     document.getElementById('uploadBox').classList.remove('hidden');
                 } else {
-                    alert("Access Denied: You are not the admin!");
+                    alert("Access Denied!");
                     auth.signOut();
                 }
             })
@@ -101,43 +96,34 @@
         const vidFile = document.getElementById('cVid').files[0];
 
         if(!title || !price || !imgFile || !vidFile) {
-            alert("Please fill all fields and select files!");
+            alert("Please fill all fields!");
             return;
         }
 
         try {
-            // A. Upload Image to Firebase Storage
             const imgRef = storage.ref(`images/${Date.now()}_${imgFile.name}`);
             await imgRef.put(imgFile);
             const imgUrl = await imgRef.getDownloadURL();
-
-            // B. Upload Video to Firebase Storage
+            
             const vidRef = storage.ref(`videos/${Date.now()}_${vidFile.name}`);
             await vidRef.put(vidFile);
             const vidUrl = await vidRef.getDownloadURL();
-
-            // C. Save Data to Firestore Database
+            
             await db.collection('courses').add({
                 title: title,
                 price: Number(price),
                 description: desc,
                 imageUrl: imgUrl,
-                videoUrl: vidUrl,
-                createdAt: new Date()
+                videoUrl: vidUrl
             });
 
-            alert("✅ Course Uploaded Successfully!");
-            // Clear form
-            document.getElementById('cTitle').value = "";
-            document.getElementById('cPrice').value = "";
-            document.getElementById('cDesc').value = "";
+            alert("✅ Course Uploaded!");
+            location.reload();
             
         } catch (error) {
-            console.error(error);
-            alert("❌ Upload Failed: " + error.message);
+            alert("❌ Error: " + error.message);
         }
     }
 </script>
-
 </body>
 </html>
