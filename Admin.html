@@ -20,86 +20,30 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
+        body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; display: flex; justify-content: center; align-items: center; position: relative; overflow: hidden; }
 
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(120px);
-            z-index: -1;
-            opacity: 0.3;
-        }
+        .blob { position: absolute; border-radius: 50%; filter: blur(120px); z-index: -1; opacity: 0.3; }
         .blob-1 { top: 0; left: 0; width: 500px; height: 500px; background: var(--secondary-neon); }
         .blob-2 { bottom: 0; right: 0; width: 400px; height: 400px; background: var(--primary-neon); }
 
-        .glass {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 40px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 0.8s ease-out;
-        }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 20px; padding: 40px; width: 90%; max-width: 500px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); animation: fadeIn 0.8s ease-out; }
 
         h2 { text-align: center; margin-bottom: 25px; font-size: 2rem; background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;}
 
         .input-group { margin-bottom: 20px; }
         .input-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #cbd5e1; }
         
-        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 10px;
-            border: 1px solid var(--glass-border);
-            background: rgba(0,0,0,0.2);
-            color: white;
-            outline: none;
-            transition: 0.3s;
-        }
+        input[type="text"], input[type="number"], input[type="password"], input[type="email"], textarea { width: 100%; padding: 12px 15px; border-radius: 10px; border: 1px solid var(--glass-border); background: rgba(0,0,0,0.2); color: white; outline: none; transition: 0.3s; }
         input:focus, textarea:focus { border-color: var(--primary-neon); box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
         
-        input[type="file"] {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0,0,0,0.2);
-            border-radius: 10px;
-            border: 1px dashed var(--secondary-neon);
-            color: #cbd5e1;
-        }
+        input[type="file"] { width: 100%; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; border: 1px dashed var(--secondary-neon); color: #cbd5e1; }
 
-        button {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon));
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: 0.3s;
-            margin-top: 10px;
-        }
+        button { width: 100%; padding: 15px; border: none; border-radius: 10px; background: linear-gradient(45deg, var(--primary-neon), var(--secondary-neon)); color: white; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
         button:hover { box-shadow: 0 0 20px var(--primary-neon); transform: translateY(-2px); }
 
         #dashboard { display: none; max-width: 600px; }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
 <body>
@@ -107,7 +51,6 @@
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
-    <!-- Admin Login Screen -->
     <div class="glass" id="loginScreen">
         <h2>Admin Portal</h2>
         <div class="input-group">
@@ -121,7 +64,6 @@
         <button onclick="adminLogin()">Access Dashboard</button>
     </div>
 
-    <!-- Admin Upload Dashboard -->
     <div class="glass" id="dashboard">
         <h2>Upload Course</h2>
         <div class="input-group">
@@ -155,23 +97,21 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
     <script>
-        // ==========================================
-        // ⚠️ PASTE YOUR FIREBASE CONFIG HERE
-        // ==========================================
+        // YOUR REAL FIREBASE CONFIGURATION
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyA-s334SmkKcFa9Y2exA8rFvYyHfwpk_kk",
+            authDomain: "mycourse-5e043.firebaseapp.com",
+            databaseURL: "https://mycourse-5e043-default-rtdb.firebaseio.com",
+            projectId: "mycourse-5e043",
+            storageBucket: "mycourse-5e043.firebasestorage.app",
+            messagingSenderId: "443359135204",
+            appId: "1:443359135204:web:b4758a8da8d6efe60a33f1"
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage();
 
-        // Check Auth State
         auth.onAuthStateChanged(user => {
             if(user && user.email === "admin@gmail.com") {
                 document.getElementById('loginScreen').style.display = 'none';
@@ -199,9 +139,7 @@
             }
         }
 
-        function logoutAdmin() {
-            auth.signOut();
-        }
+        function logoutAdmin() { auth.signOut(); }
 
         async function uploadCourse() {
             const title = document.getElementById('cTitle').value;
@@ -215,7 +153,6 @@
                 return;
             }
 
-            // Show Loading State
             Swal.fire({
                 title: 'Uploading Course...',
                 text: 'Please wait while files are uploaded to servers.',
@@ -226,12 +163,12 @@
             });
 
             try {
-                // 1. Upload Image to Storage
+                // 1. Upload Image
                 const imageRef = storage.ref(`courses/images/${Date.now()}_${imageFile.name}`);
                 await imageRef.put(imageFile);
                 const imageUrl = await imageRef.getDownloadURL();
 
-                // 2. Upload Video to Storage
+                // 2. Upload Video
                 const videoRef = storage.ref(`courses/videos/${Date.now()}_${videoFile.name}`);
                 await videoRef.put(videoFile);
                 const videoUrl = await videoRef.getDownloadURL();
@@ -246,10 +183,8 @@
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Success
                 Swal.fire({ icon: 'success', title: 'Published!', text: 'Course is now live.', background: '#0B0C10', color: '#fff' });
                 
-                // Clear Form
                 document.getElementById('cTitle').value = '';
                 document.getElementById('cPrice').value = '';
                 document.getElementById('cDesc').value = '';
@@ -258,7 +193,7 @@
 
             } catch (error) {
                 console.error(error);
-                Swal.fire({ icon: 'error', title: 'Upload Failed', text: error.message, background: '#0B0C10', color: '#fff' });
+                Swal.fire({ icon: 'error', title: 'Upload Failed', text: "Error: " + error.message, background: '#0B0C10', color: '#fff' });
             }
         }
     </script>
